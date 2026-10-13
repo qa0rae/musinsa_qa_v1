@@ -14,6 +14,25 @@
 
 초기에는 이 흐름을 중심으로 기능을 분석하고 테스트한다. 범위와 우선순위는 분석 결과에 따라 조정할 수 있다.
 
+## 저장소 구조
+
+- `study-notes/`: QA 개발·자동화 학습 노트
+- `docs/`: 무신사 서비스 분석, 기능 분석, 위험 분석, 테스트 전략
+- `test-cases/`: 수동 테스트 케이스와 실행 기록
+- `automation/`: 사이드 프로젝트의 E2E 자동화 코드와 실행 방법
+- `api/`: 프로젝트 중 관찰한 API 요청·응답 기록
+- `bug-reports/`: 재현 가능한 결함 보고서
+
+공부 노트는 학습 내용을 정리하고, 프로젝트 폴더에는 무신사 서비스에서 확인하고 검증한 산출물을 관리한다.
+
+## 주요 산출물
+
+- [서비스 분석](docs/service-analysis.md)
+- 기능 분해: `docs/feature-map.md`
+- 테스트 전략: `docs/test-strategy.md`
+- 위험 분석: `docs/risk-analysis.md`
+- [QA 개발 공부 노트](study-notes/README.md)
+
 ## 진행 방식
 
 1. **서비스 분석**: 화면과 실제 사용자 흐름을 확인하고, 확인된 사실과 가정을 구분한다.
@@ -21,20 +40,6 @@
 3. **테스트 전략 수립**: 테스트 범위, 우선순위, 테스트 기법과 확인 방법을 정한다.
 4. **수동 테스트 및 TC 작성**: 전략을 바탕으로 사전 조건, 절차, 기대 결과를 구체화한다.
 5. **자동화**: 안정적이고 반복 가치가 높은 시나리오를 Playwright로 자동화한다.
-
-## 산출물
-
-- `docs/service-analysis.md`: 서비스 및 사용자 흐름 분석
-- `docs/feature-map.md`: 기능 분해
-- `docs/test-strategy.md`: 테스트 전략
-- `docs/risk-analysis.md`: 위험 분석
-- `docs/javascript-vs-typescript.md`: JavaScript와 TypeScript 학습 노트
-- `docs/playwright-setup.md`: Playwright 설치 및 첫 실행 학습 노트
-- `docs/playwright-example-spec.md`: Playwright 기본 테스트 코드 해석 노트
-- `test-cases/`: 수동 테스트 케이스와 실행 기록
-- `api/`: API 관찰 및 검증 자료
-- `bug-reports/`: 재현 가능한 결함 보고서
-- `automation/`: E2E 자동화 코드와 실행 방법
 
 ## 테스트 원칙과 범위의 한계
 
