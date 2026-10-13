@@ -28,6 +28,7 @@
 - `docs/feature-map.md`: 기능 분해
 - `docs/test-strategy.md`: 테스트 전략
 - `docs/risk-analysis.md`: 위험 분석
+- `docs/javascript-vs-typescript.md`: JavaScript와 TypeScript 학습 노트
 - `test-cases/`: 수동 테스트 케이스와 실행 기록
 - `api/`: API 관찰 및 검증 자료
 - `bug-reports/`: 재현 가능한 결함 보고서
