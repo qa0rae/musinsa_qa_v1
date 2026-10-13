@@ -86,6 +86,39 @@ Playwright Test에서 테스트를 선언하는 `test`와 검증에 쓰는 `expe
 | `has title` | 사이트에 접속 | 페이지 제목에 `Playwright` 포함 |
 | `get started link` | `Get started` 클릭 | `Installation` 제목 표시 |
 
+## 무신사 검색창 테스트 실습
+
+무신사 메인에서 검색 입력을 확인한 실습 코드:
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('무신사 메인에서 검색어를 입력할 수 있다', async ({ page }) => {
+  await page.goto('https://www.musinsa.com/main/musinsa/recommend?gf=A');
+
+  const searchOpener = page.locator('button[data-button-id="search_window"]');
+  await searchOpener.click();
+
+  const searchField = page.getByRole('textbox', {
+    name: '검색어를 입력하세요',
+  });
+
+  await expect(searchField).toBeVisible();
+  await searchField.fill('가디건');
+  await expect(searchField).toHaveValue('가디건');
+});
+```
+
+### 이 실습에서 확인한 점
+
+- 검색창을 열기 전에는 `textbox`가 없어서 `toBeVisible()`에서 요소를 찾지 못했다. 이는 assertion이 실패한 위치와 원인을 확인하고, 사용자 흐름에 필요한 선행 행동을 테스트에 추가하는 연습이었다.
+- 검색창을 여는 버튼과 검색을 실행하는 돋보기 버튼은 서로 다른 요소였다.
+- 검색창을 여는 버튼의 `data-button-id="search_window"`는 롤링되는 홍보 문구와 분리된 식별자다. 이 고정 속성을 이용해 검색창을 열었다.
+- `getByRole('textbox', { name: '검색어를 입력하세요' })`는 입력창을 접근성 역할과 이름으로 찾는다.
+- `toBeVisible()`은 검색 입력창이 열린 뒤 화면에 보이는지 확인하고, `toHaveValue('가디건')`은 입력한 값이 필드에 들어갔는지 확인한다.
+- 롤링되는 홍보 문구를 `hasText`의 기준으로 사용하면, 문구가 바뀔 때 Locator가 요소를 찾지 못할 수 있다.
+- 이 실습은 Chromium, Firefox, WebKit 세 브라우저 프로젝트에서 모두 통과했다.
+
 ## 핵심 용어
 
 - **Test**: 검증할 시나리오 하나
