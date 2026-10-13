@@ -85,6 +85,35 @@ attemptCount = attemptCount + 1;
 2. `isLoggedIn`의 값과 타입은?
 3. 마지막 줄 실행 후 `attemptCount` 값은?
 
+## Node REPL에서 변수와 세션
+
+Node REPL은 터미널에서 `node`를 입력해 JavaScript 한 줄씩 실행해 보는 대화형 환경이다. 변수는 그 REPL 세션이 실행되는 동안 메모리에 남아 있다.
+
+```text
+> let attemptCount = 0;
+undefined
+> attemptCount = attemptCount + 1;
+1
+> .exit
+```
+
+`.exit`는 현재 Node 프로세스를 끝낸다. 다시 `node`를 실행하면 새 프로세스가 시작되므로, 이전 세션의 변수는 사라져 있다. 그래서 새 세션에서 아래 코드를 실행하면 `ReferenceError: attemptCount is not defined`가 발생한다.
+
+```text
+> attemptCount = attemptCount + 1;
+Uncaught ReferenceError: attemptCount is not defined
+```
+
+새 세션에서는 먼저 변수를 다시 선언하면 된다.
+
+```js
+let attemptCount = 0;
+attemptCount = attemptCount + 1;
+console.log(attemptCount); // 1
+```
+
+Node REPL에서 `let attemptCount = 0;`을 선언했을 때 화면에 `undefined`가 보일 수 있는데, 이는 선언문이 출력할 결과값을 반환하지 않는다는 뜻이다. 변수 선언이 실패했다는 뜻은 아니다.
+
 ## 핵심 요약
 
 - `const`: 다른 값으로 재할당하지 않을 때 사용
@@ -92,6 +121,7 @@ attemptCount = attemptCount + 1;
 - `String`, `Number`, `Boolean`: 자동화에서 자주 사용하는 기본 값
 - `Array`: 여러 테스트 데이터를 목록으로 관리
 - `Object`: 관련된 테스트 데이터를 이름 있는 속성으로 묶음
+- REPL을 종료하고 다시 시작하면 이전 세션의 변수는 메모리에 남아 있지 않으므로 다시 선언해야 함
 
 ## 참고 자료
 
