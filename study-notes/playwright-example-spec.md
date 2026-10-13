@@ -119,6 +119,18 @@ test('무신사 메인에서 검색어를 입력할 수 있다', async ({ page }
 - 롤링되는 홍보 문구를 `hasText`의 기준으로 사용하면, 문구가 바뀔 때 Locator가 요소를 찾지 못할 수 있다.
 - 이 실습은 Chromium, Firefox, WebKit 세 브라우저 프로젝트에서 모두 통과했다.
 
+## Codegen과 Locator의 변화
+
+Playwright Codegen은 브라우저 조작을 기록해 테스트 코드와 Locator 초안을 만들어준다. Codegen 자체는 최근에 새로 생긴 기능이 아니다.
+
+- Playwright v1.21 릴리스 노트에는 Codegen이 Locator와 frame Locator를 생성한다고 기록되어 있다.
+- v1.27에서는 `getByRole`, `getByLabel`, `getByPlaceholder`, `getByTestId` 등 사용자 관점의 Locator API가 추가됐다.
+- 현재 공식 문서는 Codegen이 role, text, test ID 기반 Locator를 우선한다고 설명한다. 여러 요소가 일치하면 하나를 고유하게 가리키도록 Locator를 개선한다.
+
+Codegen 결과는 그대로 완성본으로 간주하지 않는다. 이 실습에서도 롤링 홍보 문구를 포함한 Locator가 나와서, 고정된 `data-button-id="search_window"` 속성을 개발자 도구에서 확인한 뒤 직접 수정했다. 생성된 코드는 시작점이며, Locator가 실제 사용자 동작을 정확하고 안정적으로 가리키는지 QA가 검토해야 한다.
+
+XPath와 CSS Selector도 여전히 사용할 수 있다. 다만 안정적인 사용자 역할·이름이나 명시적인 테스트 식별자가 있으면 그것을 우선 검토한다.
+
 ## 핵심 용어
 
 - **Test**: 검증할 시나리오 하나
@@ -132,3 +144,5 @@ test('무신사 메인에서 검색어를 입력할 수 있다', async ({ page }
 - [Playwright 공식 문서: Writing Tests](https://playwright.dev/docs/writing-tests)
 - [Playwright 공식 문서: TypeScript 및 JavaScript의 타입 검사](https://playwright.dev/docs/test-typescript)
 - [Playwright 공식 문서: Locators](https://playwright.dev/docs/locators)
+- [Playwright 공식 문서: Test generator (Codegen)](https://playwright.dev/docs/codegen)
+- [Playwright 공식 문서: Release notes](https://playwright.dev/docs/release-notes)
