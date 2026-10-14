@@ -146,3 +146,63 @@ XPath와 CSS Selector도 여전히 사용할 수 있다. 다만 안정적인 사
 - [Playwright 공식 문서: Locators](https://playwright.dev/docs/locators)
 - [Playwright 공식 문서: Test generator (Codegen)](https://playwright.dev/docs/codegen)
 - [Playwright 공식 문서: Release notes](https://playwright.dev/docs/release-notes)
+
+
+## TypeScript 무신사 검색 제출 테스트 실습
+
+기존 `tests/musinsa-home.spec.js`를 `tests/musinsa-home.spec.ts`로 바꾸고 검색 제출 흐름을 두 테스트로 나눴다.
+
+- 돋보기 검색 버튼을 눌러 검색하는 흐름
+- 검색창에서 Enter 키를 눌러 검색하는 흐름
+
+TypeScript 파일이어도 기본 코드는 JavaScript와 비슷하게 보일 수 있다. Playwright가 `page`와 Locator의 타입을 추론하기 때문이다. Playwright는 테스트에서 TypeScript를 직접 실행할 수 있다.
+
+### 검색 결과 검증
+
+검색 동작 뒤 다음 결과를 확인했다.
+
+```ts
+await expect(page).toHaveURL(/\\/search\\/goods/);
+
+const resultUrl = new URL(page.url());
+expect(resultUrl.searchParams.get('keyword')).toBe('가디건');
+
+const resultCount = page.getByText(/^\\d[\\d,]*개$/);
+await expect(resultCount).toBeVisible();
+
+const countText = await resultCount.textContent();
+expect(Number(countText?.replace(/[^\\d]/g, ''))).toBeGreaterThan(0);
+
+const productLinks = page.getByRole('link', {
+  name: '상품 상세로 이동',
+});
+await expect(productLinks.first()).toBeVisible();
+```
+
+- `toHaveURL`은 검색 결과 페이지로 이동했는지 확인한다.
+- `URL.searchParams.get('keyword')`는 URL에 검색어가 전달됐는지 확인한다.
+- 결과 개수는 상품이 바뀌어도 숫자가 달라질 수 있으므로 고정 숫자로 비교하지 않고 0보다 큰지 확인한다.
+- 상품 링크의 접근성 이름은 모두 같을 수 있다. 검색 결과에 상품이 하나 이상 있는지 확인할 때는 `first()`를 사용해 첫 링크가 보이는지 검사할 수 있다.
+- `locator.count()`는 검색 상품 수가 아니라 해당 Locator와 일치하는 DOM 요소의 개수다. `console.log(await locator.count())`의 출력이 `1`이면 조건에 맞는 요소를 하나 찾았다는 뜻이다.
+- `.nth(2)`는 세 번째로 일치한 요소를 뜻한다(인덱스는 0부터 시작). 특정 행/열의 상품을 고정하면 정렬이나 화면 배치가 바뀔 때 테스트가 깨질 수 있다.
+- 개발자 도구에서 선택한 DOM 요소의 `data-*` 속성은 Elements 탭에서 확인하거나 Console에서 다음처럼 조회할 수 있다.
+
+```js
+[...$0.attributes]
+  .filter(({ name }) => name.startsWith('data-'))
+  .map(({ name, value }) => ({ name, value }))
+```
+
+상품 카드에서 `data-item-id`, 가격, 브랜드, 할인율, `data-item-list-id="goods_list"` 등을 확인했다. `data-item-id`는 개별 상품 ID이므로 일반 검색 테스트에서 특정 값으로 고정하지 않는다. 현재 검증은 접근성 역할과 이름을 사용한다.
+
+### 디버깅과 테스트 선택
+
+- `--grep "돋보기 버튼"`은 테스트 이름에 해당 문구가 들어간 테스트만 실행한다. 옵션을 빼면 두 검색 테스트가 모두 실행된다.
+- `page.pause()`는 테스트 실행을 멈춰 화면과 Locator를 확인하는 임시 디버깅 지점이다. Inspector로 디버깅하려면 다음처럼 `--debug`를 사용한다.
+
+```powershell
+npx playwright test tests/musinsa-home.spec.ts --project=chromium --grep "돋보기 버튼" --debug
+```
+
+- 확인을 마친 뒤에는 `page.pause()`와 진단용 `console.log`를 지우고 일반 테스트를 실행한다.
+- 브라우저 Console의 deprecation 또는 SDK 중복 로드는 사이트 스크립트에서 나온 경고일 수 있다. 검색 테스트의 PASS/FAIL은 테스트 assertion 결과로 판단하고, 콘솔 경고는 별도 조사 항목으로 기록한다.
