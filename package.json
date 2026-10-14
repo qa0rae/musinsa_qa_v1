@@ -1,0 +1,26 @@
+{
+  "name": "musinsa_qa_v1",
+  "version": "1.0.0",
+  "description": "실제 무신사 웹 서비스를 분석하고, 주요 사용자 흐름을 E2E 시나리오로 검증하는 QA 사이드 프로젝트",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qa0rae/musinsa_qa_v1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/qa0rae/musinsa_qa_v1/issues"
+  },
+  "homepage": "https://github.com/qa0rae/musinsa_qa_v1#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.5"
+  }
+}
