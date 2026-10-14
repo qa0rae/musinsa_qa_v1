@@ -1,5 +1,29 @@
 # Playwright 기본 테스트 코드 읽기
 
+## 2026-10-13 — QA 자동화와 JavaScript·Playwright 첫 실습
+
+### JavaScript 기초와 Node.js REPL
+
+- `const`는 다시 대입하지 않을 변수에, `let`은 값이 바뀔 수 있는 변수에 사용한다.
+- `typeof`로 값의 자료형을 확인했다. 예: 문자열은 `string`, 참/거짓은 `boolean`, 숫자는 `number`.
+- Node.js REPL에서 만든 변수는 현재 실행 중인 REPL 세션에만 존재한다. `.exit`로 나간 뒤 새로 실행하면 이전 변수를 사용할 수 없다.
+- 여러 줄 입력은 괄호나 중괄호가 닫히지 않았을 때 이어서 입력하며, 프롬프트가 `...`로 바뀐다.
+
+### Playwright 첫 테스트
+
+- `test()` 하나는 검증할 시나리오 하나를 정의한다. 테스트 이름은 리포트에서 어떤 시나리오인지 보여준다.
+- `async` 함수 안에서 `await`로 브라우저 동작이나 검증이 끝날 때까지 기다린다.
+- `expect()`는 기대 결과를 검증한다. 예: 페이지 제목이나 요소의 표시 여부 확인.
+- Playwright 테스트 실행 결과와 HTML 리포트에서 통과/실패를 확인했다.
+
+### 무신사 검색창과 Locator 탐색
+
+- 검색창을 여는 버튼을 누른 뒤 검색 입력창이 표시되는지 확인하고, 검색어 입력값이 반영되는지 검증했다.
+- 화면에서 계속 바뀌는 홍보 문구는 고정 Locator 기준으로 부적절할 수 있다. 요소의 `data-button-id="search_window"` 같은 속성을 확인해 검색창을 여는 버튼을 선택했다.
+- 검색창 열기 버튼과 검색 실행 돋보기 버튼은 서로 다른 동작을 한다.
+- Playwright Codegen으로 브라우저 조작을 코드로 만들 수 있지만, 생성된 Locator가 롤링 문구처럼 불안정한 기준을 쓰는지 QA가 검토해야 한다.
+- Locator는 요소를 찾는 표현이다. 의미 있는 접근성 역할과 이름 또는 안정적인 식별 속성을 우선 검토한다.
+
 ## 확인한 예제 코드
 
 ```js
@@ -147,6 +171,9 @@ XPath와 CSS Selector도 여전히 사용할 수 있다. 다만 안정적인 사
 - [Playwright 공식 문서: Test generator (Codegen)](https://playwright.dev/docs/codegen)
 - [Playwright 공식 문서: Release notes](https://playwright.dev/docs/release-notes)
 
+-------
+
+## 2026-10-14 — TypeScript 검색 자동화, Locator와 검증
 
 ## TypeScript 무신사 검색 제출 테스트 실습
 
@@ -208,36 +235,9 @@ npx playwright test tests/musinsa-home.spec.ts --project=chromium --grep "돋보
 - 브라우저 Console의 deprecation 또는 SDK 중복 로드는 사이트 스크립트에서 나온 경고일 수 있다. 검색 테스트의 PASS/FAIL은 테스트 assertion 결과로 판단하고, 콘솔 경고는 별도 조사 항목으로 기록한다.
 
 
-## 2026-10-13 — QA 자동화와 JavaScript·Playwright 첫 실습
-
-### JavaScript 기초와 Node.js REPL
-
-- `const`는 다시 대입하지 않을 변수에, `let`은 값이 바뀔 수 있는 변수에 사용한다.
-- `typeof`로 값의 자료형을 확인했다. 예: 문자열은 `string`, 참/거짓은 `boolean`, 숫자는 `number`.
-- Node.js REPL에서 만든 변수는 현재 실행 중인 REPL 세션에만 존재한다. `.exit`로 나간 뒤 새로 실행하면 이전 변수를 사용할 수 없다.
-- 여러 줄 입력은 괄호나 중괄호가 닫히지 않았을 때 이어서 입력하며, 프롬프트가 `...`로 바뀐다.
-
-### Playwright 첫 테스트
-
-- `test()` 하나는 검증할 시나리오 하나를 정의한다. 테스트 이름은 리포트에서 어떤 시나리오인지 보여준다.
-- `async` 함수 안에서 `await`로 브라우저 동작이나 검증이 끝날 때까지 기다린다.
-- `expect()`는 기대 결과를 검증한다. 예: 페이지 제목이나 요소의 표시 여부 확인.
-- Playwright 테스트 실행 결과와 HTML 리포트에서 통과/실패를 확인했다.
-
-### 무신사 검색창과 Locator 탐색
-
-- 검색창을 여는 버튼을 누른 뒤 검색 입력창이 표시되는지 확인하고, 검색어 입력값이 반영되는지 검증했다.
-- 화면에서 계속 바뀌는 홍보 문구는 고정 Locator 기준으로 부적절할 수 있다. 요소의 `data-button-id="search_window"` 같은 속성을 확인해 검색창을 여는 버튼을 선택했다.
-- 검색창 열기 버튼과 검색 실행 돋보기 버튼은 서로 다른 동작을 한다.
-- Playwright Codegen으로 브라우저 조작을 코드로 만들 수 있지만, 생성된 Locator가 롤링 문구처럼 불안정한 기준을 쓰는지 QA가 검토해야 한다.
-- Locator는 요소를 찾는 표현이다. 의미 있는 접근성 역할과 이름 또는 안정적인 식별 속성을 우선 검토한다.
-
-## 2026-10-14 — TypeScript 검색 자동화, Locator와 검증
-
 ### TypeScript로 테스트 작성
 
 - 테스트 파일을 `musinsa-home.spec.ts`로 작성하기로 했다. Playwright 설정 파일이 `playwright.config.js`여도 테스트 파일을 TypeScript로 쓰는 데 문제없다.
-- 파일명에 Playwright가 인식하는 `.spec.ts` 형태가 필요하다. `musinsa-home.ts`처럼 `.spec`이 빠지면 테스트를 찾지 못할 수 있다.
 - 한 테스트 파일에는 여러 `test()`가 있을 수 있고, 각 테스트 안에는 여러 행동과 검증이 들어간다.
 - 돋보기 버튼으로 검색하는 흐름과 Enter 키로 검색하는 흐름을 별도 테스트로 작성했다.
 
@@ -245,7 +245,6 @@ npx playwright test tests/musinsa-home.spec.ts --project=chromium --grep "돋보
 
 - 검색 후 URL 경로가 검색 결과 페이지인지, 쿼리의 `keyword` 값이 `가디건`인지 확인했다.
 - 검색 결과 개수는 매번 달라지므로 특정 숫자로 고정하지 않고, 숫자와 쉼표 뒤에 `개`가 붙는 텍스트를 찾아 0보다 큰지 확인했다.
-- 결과 개수 Locator 변수명은 직접 정하는 이름이다. 예를 들어 `resultCount`는 그 Locator를 가리키도록 작성자가 붙인 이름이다.
 - 상품 링크 Locator가 여러 개면 `.first()`는 첫 번째 일치 요소를, `.nth(2)`는 세 번째 일치 요소를 가리킨다(인덱스는 0부터 시작). 상품 순서나 화면 위치는 바뀔 수 있으니 특정 상품 위치에 불필요하게 의존하지 않는다.
 - `locator.count()`는 Locator와 일치하는 DOM 요소 수를 반환한다. 검색 상품 수 자체를 의미하는 것은 아니다.
 - 개발자 도구에서 선택한 요소의 `data-*` 속성을 확인해 상품 ID, 가격, 브랜드, 할인율, 상품 목록 식별 정보를 살펴봤다. 개별 상품 ID는 검색 결과에 따라 달라지므로 일반적인 검색 테스트에 고정하지 않는다.
