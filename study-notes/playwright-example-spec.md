@@ -255,3 +255,31 @@ console.log('두 검증 다음의 코드도 실행된다');
 - `git push`는 로컬 커밋을 원격 GitHub 저장소에 올린다.
 - `git pull --rebase`는 원격 변경을 먼저 반영하고 내 커밋을 그 위에 다시 적용한다. 스테이징이나 미커밋 변경이 있으면 먼저 커밋하거나 보관해야 할 수 있다.
 - `tests/example.spec.js`와 `tests/musinsa-home.spec.ts`는 서로 다른 테스트 파일이므로 함께 존재할 수 있다.
+
+
+## 2026-10-15 — 테스트 그룹과 공통 준비 단계
+
+두 검색 테스트에서 반복되던 페이지 접속과 검색창 열기를 `test.beforeEach()`로 옮기고, 두 테스트를 `test.describe()` 안에 묶었다.
+
+```ts
+test.describe('무신사 검색', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('https://www.musinsa.com/main/musinsa/recommend?gf=A');
+    await page.locator('button[data-button-id="search_window"]').click();
+  });
+
+  test('돋보기 버튼으로 검색할 수 있다', async ({ page }) => {
+    // 각 테스트에만 필요한 검색 동작과 검증
+  });
+
+  test('Enter 키로 검색할 수 있다', async ({ page }) => {
+    // 각 테스트에만 필요한 검색 동작과 검증
+  });
+});
+```
+
+- `test.describe()`는 관련 테스트를 그룹으로 묶는다.
+- `test.beforeEach()`는 그룹 안의 각 테스트가 시작되기 전에 실행된다. 두 테스트를 실행하면 페이지 접속과 검색창 열기도 각각 실행된다.
+- `beforeEach`의 범위는 해당 `test.describe()` 안에 포함된 테스트다. 닫는 괄호를 먼저 써서 그룹을 닫으면 뒤의 테스트에는 적용되지 않는다.
+- 공통 사전 준비는 `beforeEach`에 두고, 돋보기 클릭과 Enter 입력처럼 시나리오마다 다른 행동은 각 테스트 안에 둔다.
+- 수정 후 돋보기 검색과 Enter 검색 테스트가 모두 통과했다.
