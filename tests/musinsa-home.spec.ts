@@ -1,4 +1,13 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, defineConfig, devices } from '@playwright/test';
+
+
+// 해당 프로젝트는 chromium만 사용
+/*project: [
+  {
+    name: 'chromium',
+    use : { ...devices['Desktop Chrome']},
+  },
+]*/
 
 test.describe('무신사 검색', () => {
   test.beforeEach(async ({page}) => {
@@ -14,7 +23,7 @@ test.describe('무신사 검색', () => {
 
     const searchField = page.getByRole('textbox', {name: '검색어를 입력하세요',});
 
-    await searchField.pressSequentially('가디건');
+    await searchField.fill('가디건');
     await expect(searchField).toHaveValue('가디건');
     await page.getByRole('button', { name: '검색', exact: true }).click();
     await expect(page).toHaveURL(/\/search\/goods/);
@@ -43,7 +52,7 @@ test.describe('무신사 검색', () => {
       name: '검색어를 입력하세요',
     });
 
-    await searchField.pressSequentially('가디건');
+    await searchField.fill('가디건');
     await expect(searchField).toHaveValue('가디건');
     await searchField.press('Enter');
     await expect(page).toHaveURL(/\/search\/goods/);
