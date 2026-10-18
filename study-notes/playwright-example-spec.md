@@ -1,6 +1,7 @@
 # Playwright 기본 테스트 코드 읽기
 
-## 2026-10-13 — QA 자동화와 JavaScript·Playwright 첫 실습
+<details>
+<summary>2026-10-13 — QA 자동화와 JavaScript·Playwright 첫 실습</summary>
 
 ### JavaScript 기초와 Node.js REPL
 
@@ -173,7 +174,10 @@ XPath와 CSS Selector도 여전히 사용할 수 있다. 다만 안정적인 사
 
 -------
 
-## 2026-10-14 — TypeScript 검색 자동화, Locator와 검증
+</details>
+
+<details>
+<summary>2026-10-14 — TypeScript 검색 자동화, Locator와 검증</summary>
 
 ### TypeScript 무신사 검색 제출 테스트 실습
 
@@ -256,8 +260,10 @@ console.log('두 검증 다음의 코드도 실행된다');
 - `git pull --rebase`는 원격 변경을 먼저 반영하고 내 커밋을 그 위에 다시 적용한다. 스테이징이나 미커밋 변경이 있으면 먼저 커밋하거나 보관해야 할 수 있다.
 - `tests/example.spec.js`와 `tests/musinsa-home.spec.ts`는 서로 다른 테스트 파일이므로 함께 존재할 수 있다.
 
+</details>
 
-## 2026-10-15 — 테스트 그룹과 공통 준비 단계
+<details>
+<summary>2026-10-15 — 테스트 그룹과 공통 준비 단계</summary>
 
 두 검색 테스트에서 반복되던 페이지 접속과 검색창 열기를 `test.beforeEach()`로 옮기고, 두 테스트를 `test.describe()` 안에 묶었다.
 
@@ -284,8 +290,10 @@ test.describe('무신사 검색', () => {
 - 공통 사전 준비는 `beforeEach`에 두고, 돋보기 클릭과 Enter 입력처럼 시나리오마다 다른 행동은 각 테스트 안에 둔다.
 - 수정 후 돋보기 검색과 Enter 검색 테스트가 모두 통과했다.
 
+</details>
 
-## 2026-10-15 — 검색 결과 없음 테스트와 입력 이벤트 비교
+<details>
+<summary>2026-10-15 — 검색 결과 없음 테스트와 입력 이벤트 비교</summary>
 
 ### `fill()`과 `pressSequentially()`
 
@@ -310,8 +318,10 @@ test.describe('무신사 검색', () => {
 - 필터 초기화 버튼을 눌러 검색 결과 없음 문구를 맞추면 검색 시나리오에 필터 초기화 행동이 섞인다. 검색 자체를 검증할 때는 두 행동을 분리한다.
 - 관찰한 결과와 원인 가설을 구분해서 기록한다. 이번 사례에서 확인된 것은 입력 방식/간격별 결과 차이이며, 내부 원인은 추가 확인이 필요하다.
 
+</details>
 
-## 2026-10-18 — TypeScript·Playwright 검색 테스트 코드 한 줄씩 읽기
+<details>
+<summary>2026-10-18 — TypeScript·Playwright 검색 테스트 코드 한 줄씩 읽기</summary>
 
 오늘은 `tests/musinsa-home.spec.ts` 전체를 위에서 아래로 읽으며 JavaScript/TypeScript 문법과 Playwright 기능을 구분했다.
 
@@ -559,3 +569,5 @@ await expect(page.getByText('다른 검색어를 입력해 보세요.', { exact:
 - 테스트 파일에서 쓰지 않는 `defineConfig`와 `devices` import는 제거할 수 있다. 이 설정 기능은 `playwright.config.js`에서 사용한다.
 - 주석으로 남은 중복 `goto`·검색창 열기 코드와 사용하지 않는 디버깅 코드는 정리할 수 있다.
 - Chromium만 기본으로 실행하는 설정은 테스트 파일이 아니라 `playwright.config.js`의 `projects`에 둔다.
+
+</details>
