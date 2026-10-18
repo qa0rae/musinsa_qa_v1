@@ -189,16 +189,16 @@ TypeScript 파일이어도 기본 코드는 JavaScript와 비슷하게 보일 �
 검색 동작 뒤 다음 결과를 확인했다.
 
 ```ts
-await expect(page).toHaveURL(/\\/search\\/goods/);
+await expect(page).toHaveURL(/\/search\/goods/);
 
 const resultUrl = new URL(page.url());
 expect(resultUrl.searchParams.get('keyword')).toBe('가디건');
 
-const resultCount = page.getByText(/^\\d[\\d,]*개$/);
+const resultCount = page.getByText(/^\d[\d,]*개$/);
 await expect(resultCount).toBeVisible();
 
 const countText = await resultCount.textContent();
-expect(Number(countText?.replace(/[^\\d]/g, ''))).toBeGreaterThan(0);
+expect(Number(countText?.replace(/[^\d]/g, ''))).toBeGreaterThan(0);
 
 const productLinks = page.getByRole('link', {
   name: '상품 상세로 이동',
@@ -428,12 +428,12 @@ await page.getByRole('button', { name: '검색', exact: true }).click();
 - `.click()`으로 검색 버튼을 누른다.
 
 ```ts
-await expect(page).toHaveURL(/\\/search\\/goods/);
+await expect(page).toHaveURL(/\/search\/goods/);
 ```
 
 - 검색 뒤 페이지 주소가 `/search/goods`를 포함하는지 확인한다.
 - `/.../`는 정규식 리터럴이다.
-- 정규식 안의 `\\/`는 실제 슬래시 문자 `/`를 표현한다.
+- 정규식 안의 `\/`는 실제 슬래시 문자 `/`를 표현한다.
 - `toHaveURL`은 URL이 기대 조건과 일치할 때까지 재확인한다.
 
 ```ts
@@ -447,12 +447,12 @@ expect(resultUrl.searchParams.get('keyword')).toBe('가디건');
 - `.toBe('가디건')`은 값이 문자열 `가디건`과 정확히 같은지 비교한다.
 
 ```ts
-const resultCount = page.getByText(/^\\d[\\d,]*개$/);
+const resultCount = page.getByText(/^\d[\d,]*개$/);
 await expect(resultCount).toBeVisible();
 ```
 
 - `getByText(...)`는 화면의 텍스트로 요소를 찾는다.
-- 정규식 `^\\d[\\d,]*개$`는 숫자로 시작하고 숫자나 쉼표가 이어진 다음 `개`로 끝나는 문구를 찾는다. 예: `66,427개`.
+- 정규식 `^\d[\d,]*개$`는 숫자로 시작하고 숫자나 쉼표가 이어진 다음 `개`로 끝나는 문구를 찾는다. 예: `66,427개`.
 - `toBeVisible()`은 해당 문구가 화면에 보이는지 확인한다.
 
 ```ts
@@ -463,12 +463,12 @@ await expect(resultCount).toBeVisible();
 
 ```ts
 const countText = await resultCount.textContent();
-expect(Number(countText?.replace(/[^\\d]/g, ''))).toBeGreaterThan(0);
+expect(Number(countText?.replace(/[^\d]/g, ''))).toBeGreaterThan(0);
 ```
 
 - `.textContent()`는 Locator가 가리키는 요소 안의 텍스트를 가져온다. 값이 없을 수 있어 결과에 `null` 가능성이 있다.
 - `?.`는 앞의 값이 `null`이나 `undefined`이면 뒤의 메서드를 실행하지 않는 옵셔널 체이닝이다.
-- `replace(/[^\\d]/g, '')`는 숫자가 아닌 문자를 모두 빈 문자열로 바꾼다. 예를 들어 `66,427개`에서 쉼표와 `개`가 제거된다.
+- `replace(/[^\d]/g, '')`는 숫자가 아닌 문자를 모두 빈 문자열로 바꾼다. 예를 들어 `66,427개`에서 쉼표와 `개`가 제거된다.
 - `Number(...)`는 문자열을 숫자로 변환한다.
 - `toBeGreaterThan(0)`은 결과 숫자가 0보다 큰지 확인한다.
 
