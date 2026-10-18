@@ -309,3 +309,253 @@ test.describe('무신사 검색', () => {
 - 자동화 결과와 수동 테스트 결과가 다르면 기대 결과를 자동화에 맞춰 바꾸기 전에 입력 방법, 브라우저, URL, 화면 상태를 비교한다.
 - 필터 초기화 버튼을 눌러 검색 결과 없음 문구를 맞추면 검색 시나리오에 필터 초기화 행동이 섞인다. 검색 자체를 검증할 때는 두 행동을 분리한다.
 - 관찰한 결과와 원인 가설을 구분해서 기록한다. 이번 사례에서 확인된 것은 입력 방식/간격별 결과 차이이며, 내부 원인은 추가 확인이 필요하다.
+
+
+## 2026-10-18 — TypeScript·Playwright 검색 테스트 코드 한 줄씩 읽기
+
+오늘은 `tests/musinsa-home.spec.ts` 전체를 위에서 아래로 읽으며 JavaScript/TypeScript 문법과 Playwright 기능을 구분했다.
+
+### 1. Import와 주석
+
+```ts
+import { test, expect, defineConfig, devices } from '@playwright/test';
+```
+
+- `import`는 다른 파일이나 패키지에서 제공하는 이름을 현재 파일에서 사용할 수 있도록 가져오는 JavaScript 문법이다.
+- 중괄호 안의 이름은 패키지가 제공하는 항목 중 필요한 것을 지정해 가져온다.
+- `test`와 `expect`는 이 테스트 파일에서 사용한다.
+- `defineConfig`와 `devices`는 이 파일에서 사용되지 않는다. 브라우저 프로젝트 설정에 쓰는 이름이므로 `playwright.config.js`에서 가져와야 한다.
+- 각 파일은 별도의 모듈이므로 한 파일의 import가 다른 파일에 자동으로 적용되지 않는다.
+
+```ts
+// 해당 프로젝트는 chromium만 사용
+/* project 설정 예시 */
+```
+
+- `//`로 시작하는 줄과 `/* ... */` 안의 내용은 주석이라 실행되지 않는다.
+- 테스트 파일 안에 Chromium 설정을 주석으로 적어도 브라우저 실행 설정은 바뀌지 않는다.
+- 기본 실행 브라우저를 제한하려면 `playwright.config.js`의 `projects` 설정에 둔다. 속성명은 `project`가 아니라 `projects`다.
+
+### 2. 검색 테스트 그룹과 공통 준비
+
+```ts
+test.describe('무신사 검색', () => {
+```
+
+- `test.describe(...)`는 관련 테스트를 그룹으로 묶는 Playwright 기능이다.
+- 문자열 `'무신사 검색'`은 테스트 리포트에 표시될 그룹 이름이다.
+- `() => { ... }`는 그룹에 포함할 테스트를 담는 화살표 함수다.
+- 이 함수 안의 여는 중괄호는 마지막 그룹 닫는 부분에서 닫힌다.
+
+```ts
+test.beforeEach(async ({ page }) => {
+```
+
+- `test.beforeEach(...)`는 그룹 안의 각 테스트가 시작되기 전에 실행할 준비 동작을 등록한다.
+- `async`는 함수 안에서 `await`를 사용할 수 있도록 하는 JavaScript 문법이다.
+- `({ page })`는 Playwright가 전달하는 값에서 `page`를 꺼내는 구조 분해 문법이다. `page`는 테스트가 사용하는 브라우저 페이지(탭)를 가리킨다.
+- `=>`는 화살표 함수를 표시한다.
+- `beforeEach` 안의 코드 블록은 중괄호 안에 작성한다.
+
+```ts
+await page.goto('https://www.musinsa.com/main/musinsa/recommend?gf=A');
+```
+
+- `page`는 브라우저 페이지를 가리키는 변수다.
+- 점(`.`)은 객체가 가진 기능이나 값을 가져올 때 쓴다.
+- `goto`는 해당 페이지를 지정한 주소로 이동시키는 Playwright 메서드다. 객체에 연결된 함수를 메서드라고 한다.
+- 괄호 안의 URL은 작은따옴표로 감싼 문자열이다.
+- `await`는 시간이 걸릴 수 있는 페이지 이동 작업이 끝날 때까지 기다린다.
+- 세미콜론(`;`)은 문장 끝을 표시한다.
+
+```ts
+await page.locator('button[data-button-id="search_window"]').click();
+```
+
+- `page.locator(...)`는 조건에 맞는 화면 요소를 찾는 Locator를 만든다.
+- 괄호 안 문자열은 CSS 선택자다.
+  - `button`: HTML 버튼 요소
+  - `[data-button-id="search_window"]`: `data-button-id` 속성값이 `search_window`인 요소
+- `.click()`은 찾은 요소를 클릭한다.
+- `locator(...)`는 찾기 위한 대상을 지정하고 `.click()`은 그 대상을 누른다.
+- 이 버튼은 검색창을 여는 버튼이다.
+
+```ts
+});
+```
+
+이 줄은 `beforeEach` 함수의 중괄호를 닫고, `test.beforeEach(...)` 호출을 끝낸다. 바깥의 `test.describe` 그룹은 계속 열려 있다.
+
+### 3. 돋보기 검색 테스트
+
+```ts
+test('돋보기 버튼으로 검색할 수 있다', async ({ page }) => {
+```
+
+- `test(...)`는 테스트 케이스 하나를 선언한다.
+- 첫 번째 문자열은 테스트 리포트에 보일 이름이다.
+- 뒤의 비동기 함수가 해당 시나리오에서 실행할 동작과 검증을 담는다.
+- `page`는 Playwright가 이 테스트에 제공하는 페이지다.
+
+테스트 안에 주석 처리된 `page.goto(...)`와 검색창 열기 코드는 실행되지 않는다. 해당 준비를 `beforeEach`로 옮긴 뒤 남아 있는 예전 코드다.
+
+```ts
+const searchField = page.getByRole('textbox', { name: '검색어를 입력하세요' });
+```
+
+- `const`는 변수를 선언하는 문법이다. 선언한 뒤 다른 값을 다시 대입하지 않을 변수에 쓴다.
+- `page.getByRole(...)`은 접근성 역할과 이름으로 화면 요소를 찾는 Playwright 메서드다.
+- `textbox`는 텍스트 입력창 역할이다.
+- `{ name: ... }`는 찾을 요소의 이름 조건을 담은 객체다.
+- `searchField`는 입력창 요소 자체가 아니라 해당 요소를 찾는 Locator를 담는다.
+
+```ts
+await searchField.fill('가디건');
+await expect(searchField).toHaveValue('가디건');
+```
+
+- `.fill(...)`은 입력창의 값을 한 번에 설정하는 Playwright 메서드다.
+- `expect(searchField)`는 검색창 상태를 검증하겠다는 뜻이다.
+- `.toHaveValue(...)`는 입력창 값이 기대한 문자열인지 확인하는 Playwright assertion이다.
+- `await`를 붙인 웹 우선 assertion은 기대 조건이 만족될 때까지 재확인한다.
+
+```ts
+await page.getByRole('button', { name: '검색', exact: true }).click();
+```
+
+- 역할이 버튼이고 이름이 정확히 `검색`인 요소를 찾는다.
+- `exact: true`는 이름이 정확히 일치해야 한다는 조건이다.
+- `.click()`으로 검색 버튼을 누른다.
+
+```ts
+await expect(page).toHaveURL(/\\/search\\/goods/);
+```
+
+- 검색 뒤 페이지 주소가 `/search/goods`를 포함하는지 확인한다.
+- `/.../`는 정규식 리터럴이다.
+- 정규식 안의 `\\/`는 실제 슬래시 문자 `/`를 표현한다.
+- `toHaveURL`은 URL이 기대 조건과 일치할 때까지 재확인한다.
+
+```ts
+const resultUrl = new URL(page.url());
+expect(resultUrl.searchParams.get('keyword')).toBe('가디건');
+```
+
+- `page.url()`은 현재 주소를 문자열로 반환한다.
+- `new URL(...)`은 문자열 주소를 분석하기 쉬운 URL 객체로 만든다.
+- `searchParams.get('keyword')`는 URL의 `keyword` 쿼리값을 가져온다.
+- `.toBe('가디건')`은 값이 문자열 `가디건`과 정확히 같은지 비교한다.
+
+```ts
+const resultCount = page.getByText(/^\\d[\\d,]*개$/);
+await expect(resultCount).toBeVisible();
+```
+
+- `getByText(...)`는 화면의 텍스트로 요소를 찾는다.
+- 정규식 `^\\d[\\d,]*개$`는 숫자로 시작하고 숫자나 쉼표가 이어진 다음 `개`로 끝나는 문구를 찾는다. 예: `66,427개`.
+- `toBeVisible()`은 해당 문구가 화면에 보이는지 확인한다.
+
+```ts
+//await page.pause();//
+```
+
+줄 처음의 `//`부터 줄 끝까지가 주석이므로 `page.pause()`는 실행되지 않는다. 디버깅 때 쓰던 코드를 비활성화한 상태다.
+
+```ts
+const countText = await resultCount.textContent();
+expect(Number(countText?.replace(/[^\\d]/g, ''))).toBeGreaterThan(0);
+```
+
+- `.textContent()`는 Locator가 가리키는 요소 안의 텍스트를 가져온다. 값이 없을 수 있어 결과에 `null` 가능성이 있다.
+- `?.`는 앞의 값이 `null`이나 `undefined`이면 뒤의 메서드를 실행하지 않는 옵셔널 체이닝이다.
+- `replace(/[^\\d]/g, '')`는 숫자가 아닌 문자를 모두 빈 문자열로 바꾼다. 예를 들어 `66,427개`에서 쉼표와 `개`가 제거된다.
+- `Number(...)`는 문자열을 숫자로 변환한다.
+- `toBeGreaterThan(0)`은 결과 숫자가 0보다 큰지 확인한다.
+
+```ts
+const productLinks = page.getByRole('link', { name: '상품 상세로 이동' });
+await expect(productLinks.first()).toBeVisible();
+```
+
+- `getByRole('link', ...)`는 링크 역할과 이름이 일치하는 요소를 찾는다. 같은 이름의 링크가 여러 개일 수 있다.
+- `.first()`는 그중 첫 번째 요소를 가리킨다.
+- `.toBeVisible()`은 첫 번째 상품 링크가 보이는지 확인한다. 모든 링크를 검증하는 것은 아니다.
+
+### 4. Enter 검색 테스트
+
+```ts
+test('Enter 키로 검색할 수 있다', async ({ page }) => {
+```
+
+별도 테스트 케이스를 선언한다. 검색창을 찾는 Locator, 값을 채우고 확인하는 부분, URL과 결과 수·상품 링크 검증은 앞 테스트와 같은 의미다.
+
+```ts
+await searchField.press('Enter');
+```
+
+- `.press('Enter')`는 입력창에 Enter 키를 보내는 Playwright 메서드다.
+- `.fill()`처럼 텍스트를 넣는 동작이 아니라 키 입력 동작이다.
+- 이 테스트는 돋보기 대신 Enter 키로 검색을 실행한다.
+
+### 5. 검색 결과 없음 테스트
+
+```ts
+test('잘못된 단어로 검색 결과가 없음 화면', async ({ page }) => {
+```
+
+검색 결과가 없는 검색어로 검색한 뒤 기대한 안내 문구를 확인하는 테스트 케이스다. 시작 전에는 이 테스트에도 `beforeEach`가 실행된다.
+
+```ts
+const searchField = page.getByRole('textbox', { name: '검색어를 입력하세요' });
+await searchField.click();
+```
+
+검색 입력창을 찾은 뒤 클릭해 포커스를 준다. 포커스는 키보드 입력이 어느 입력 요소에 들어갈지 정해진 상태다.
+
+```ts
+await searchField.pressSequentially('qa_no_result', { delay: 50 });
+```
+
+- `.pressSequentially(...)`는 문자열을 한 번에 설정하는 대신 글자별 키보드 이벤트로 입력하는 Playwright 메서드다.
+- `delay: 50`은 글자 입력 사이에 50밀리초 간격을 둔다는 뜻이다.
+- 해당 간격에서 테스트가 통과한 것은 관찰한 결과다. 정확한 내부 원인은 확인되지 않았다.
+
+```ts
+await expect(searchField).toHaveValue('qa_no_result');
+await searchField.press('Enter');
+```
+
+Enter를 누르기 전에 입력값이 기대한 문자열인지 확인하고, 이후 Enter 키로 검색을 실행한다.
+
+```ts
+/*await page.getByRole('button', { name: '검색', exact: true }).click();*/
+```
+
+주석이므로 실행되지 않는다. 이 테스트는 Enter 검색 시나리오라서 검색 버튼 클릭을 수행하지 않는다.
+
+```ts
+await expect(page.getByText('검색 결과가 없습니다.', { exact: true })).toBeVisible();
+await expect(page.getByText('다른 검색어를 입력해 보세요.', { exact: true })).toBeVisible();
+```
+
+- `getByText(...)`로 각 안내 문구를 찾는다.
+- `exact: true`는 부분 포함이 아니라 문구 전체가 정확히 일치하는 요소를 찾는다.
+- 각 `toBeVisible()`은 해당 안내 문구가 보이는지 검증한다.
+- 기본 `expect` 검증 하나라도 실패하면 테스트는 실패하고 그 아래의 코드는 더 실행되지 않는다.
+
+### 6. 괄호와 중괄호 닫기
+
+각 테스트 끝의 `});`는 해당 테스트 함수의 코드 블록, `test(...)` 호출, 문장을 차례로 닫는다. 가장 마지막 `});`는 바깥의 `test.describe(...)` 그룹을 닫는다.
+
+### 전체 테스트의 실행 흐름
+
+1. `beforeEach`에서 무신사 메인 페이지에 접속하고 검색창을 연다.
+2. 각 `test(...)` 시나리오에서 검색어를 입력한다.
+3. 돋보기 또는 Enter로 검색을 실행한다.
+4. URL, 검색어, 결과 개수, 상품 링크 또는 결과 없음 안내 문구를 검증한다.
+
+### 코드 정리 메모
+
+- 테스트 파일에서 쓰지 않는 `defineConfig`와 `devices` import는 제거할 수 있다. 이 설정 기능은 `playwright.config.js`에서 사용한다.
+- 주석으로 남은 중복 `goto`·검색창 열기 코드와 사용하지 않는 디버깅 코드는 정리할 수 있다.
+- Chromium만 기본으로 실행하는 설정은 테스트 파일이 아니라 `playwright.config.js`의 `projects`에 둔다.
