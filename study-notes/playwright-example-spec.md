@@ -571,3 +571,116 @@ await expect(page.getByText('다른 검색어를 입력해 보세요.', { exact:
 - Chromium만 기본으로 실행하는 설정은 테스트 파일이 아니라 `playwright.config.js`의 `projects`에 둔다.
 
 </details>
+
+<details>
+<summary>2026-10-19 — 함수, 매개변수와 콜백</summary>
+
+### 함수와 호출
+
+함수는 실행할 동작을 묶어 둔 것이다. 함수 이름 뒤에 괄호를 붙이면 호출한다.
+
+```js
+function greet(name) {
+  console.log(`안녕, ${name}`);
+}
+
+greet('영래');
+```
+
+- `function greet(name)`은 `greet` 함수를 선언한다.
+- `name`은 함수가 호출될 때 전달받을 자리를 나타내는 매개변수(parameter)다.
+- `'영래'`는 호출할 때 실제로 전달한 값인 인자(argument)다.
+- `greet('영래')`처럼 호출하면 함수 안의 동작이 실행된다.
+
+### 화살표 함수와 매개변수
+
+함수는 화살표 함수 문법으로도 작성할 수 있다.
+
+```js
+const greet = (name) => {
+  console.log(`안녕, ${name}`);
+};
+```
+
+`function greet(name) { ... }`와 `const greet = (name) => { ... }`는 여기서 같은 동작을 표현한다. 화살표 함수의 `=>` 뒤 중괄호 안에 함수가 실행할 코드를 작성한다.
+
+### 콜백 함수
+
+함수를 다른 함수에 전달해 두고, 그 함수가 정해진 시점에 실행하게 할 수 있다. 전달된 함수를 콜백 함수(callback function)라고 한다.
+
+```ts
+test('검색할 수 있다', async ({ page }) => {
+  await page.goto('https://www.musinsa.com');
+});
+```
+
+- `test`는 Playwright Test에서 가져온 함수다.
+- 첫 번째 인자는 테스트 이름이다.
+- 두 번째 인자인 `async ({ page }) => { ... }`는 테스트 실행 동작을 담은 콜백 함수다.
+- 테스트 러너가 해당 테스트를 실행할 때 콜백을 호출한다.
+- `test.beforeEach(...)`에도 준비 작업을 담은 콜백을 전달한다. 이 콜백은 각 테스트 시작 전에 실행된다.
+
+함수 자체를 가리키는 것과 호출하는 것은 다르다.
+
+```js
+sayHi;   // 함수 자체를 가리킴
+sayHi(); // 함수 호출
+```
+
+Playwright의 `test(...)`에는 실행할 함수를 인자로 전달한다. 함수 뒤에 괄호를 붙여 그 자리에서 직접 호출하는 형태가 아니다.
+
+### `({ page })`와 구조 분해
+
+Playwright는 테스트 콜백에 `page` 등의 fixture가 들어 있는 객체를 전달한다. `({ page })`는 전달받은 객체에서 `page`만 꺼내는 구조 분해 문법이다.
+
+```ts
+async (fixtures) => {
+  const page = fixtures.page;
+  await page.goto('https://www.musinsa.com');
+}
+```
+
+위 코드는 다음처럼 짧게 쓸 수 있다.
+
+```ts
+async ({ page }) => {
+  await page.goto('https://www.musinsa.com');
+}
+```
+
+여기서 `page`는 함수가 전달받아 사용하는 페이지 객체다. `page.goto('주소')`에서 `page`는 메서드를 실행하는 대상이고, 괄호 안의 주소는 이동할 URL이다.
+
+### `return`
+
+`return`은 함수가 만든 값을 함수 바깥으로 돌려준다.
+
+```js
+function multiply(a, b) {
+  return a * b;
+}
+
+const total = multiply(3, 4);
+console.log(total); // 12
+```
+
+- 함수에 전달된 `a`, `b`는 매개변수이고, `3`, `4`는 인자다.
+- `return a * b`가 계산 결과 `12`를 호출한 곳으로 돌려준다.
+- 돌려받은 값은 `total`에 저장된다.
+- `console.log()`는 값을 출력하고, `return`은 값을 함수 바깥에서 다시 쓸 수 있게 전달한다.
+- 값을 명시적으로 반환하지 않은 함수의 반환값은 `undefined`다.
+
+Playwright 테스트 콜백에서는 보통 직접 `return`을 작성하지 않는다. 페이지 동작과 assertion을 실행하고 끝나면 된다.
+
+### 오늘의 이해 확인
+
+```js
+function multiply(a, b) {
+  return a * b;
+}
+
+const total = multiply(3, 4);
+```
+
+`total`에는 `12`가 들어간다.
+
+</details>
