@@ -684,3 +684,117 @@ const total = multiply(3, 4);
 `total`에는 `12`가 들어간다.
 
 </details>
+
+<details>
+<summary>2026-10-20 — async, await와 Promise</summary>
+
+### 동기 코드와 비동기 작업의 실행 순서
+
+JavaScript 코드는 기본적으로 한 줄씩 실행한다. 시간이 걸릴 수 있는 작업은 나중에 실행할 동작을 예약하고, 그 사이 다음 코드를 실행할 수 있다.
+
+```js
+console.log('검색 시작');
+
+setTimeout(() => {
+  console.log('검색 응답 받음');
+}, 100);
+
+console.log('다음 코드 실행');
+```
+
+출력 순서는 다음과 같다.
+
+1. `검색 시작`
+2. `다음 코드 실행`
+3. 약 100밀리초가 지난 뒤 `검색 응답 받음`
+
+- `setTimeout(callback, 100)`은 콜백을 약 100ms 뒤 실행하도록 예약한다. 100ms는 0.1초다.
+- 지정 시간은 콜백이 실행될 수 있는 최소 대기 기준에 가깝다. JavaScript가 다른 작업을 처리 중이면 실제 실행은 더 늦어질 수 있다.
+- `setTimeout`은 현재 코드 실행을 멈춰 세우지 않는다.
+- 여기서 `setTimeout`은 타이머를 예약하는 기능이며, 그 자체가 Promise인 것은 아니다.
+
+### Promise
+
+Promise는 비동기 작업의 결과가 아직 준비되지 않았을 때, 나중에 결과나 실패가 전달될 것을 나타내는 객체다.
+
+- `pending`: 아직 결과를 기다리는 중
+- `fulfilled`: 작업이 성공해 결과가 준비됨
+- `rejected`: 작업이 실패함
+
+`resolve(value)`는 Promise가 성공적으로 완료됐고 `value`를 결과로 전달한다고 알린다. `.then(callback)`은 Promise가 성공한 뒤 실행할 함수를 등록한다. `.then()`은 기다리는 동안 다음 동기 코드를 멈추지 않는다.
+
+```js
+const searchPromise = new Promise((resolve) => {
+  setTimeout(() => {
+    resolve('검색 응답 받음');
+  }, 100);
+});
+
+console.log('검색 시작');
+
+searchPromise.then((result) => {
+  console.log(result);
+});
+
+console.log('다음 코드 실행');
+```
+
+이 코드도 `검색 시작 → 다음 코드 실행 → 검색 응답 받음` 순서로 출력된다. `.then()`은 나중에 실행할 콜백을 등록하는 것이지, 현재 함수를 기다리게 하는 문법은 아니다.
+
+### `async`와 `await`
+
+`async`는 비동기 함수를 선언하는 문법이고, 그 함수 안에서 Promise를 `await`로 기다릴 수 있다. `await`은 Promise가 완료될 때까지 현재 `async` 함수의 다음 코드 실행을 잠시 보류한다. 프로그램 전체를 멈추는 것은 아니다.
+
+```js
+async function runSearch() {
+  console.log('검색 시작');
+
+  const result = await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('검색 응답 받음');
+    }, 100);
+  });
+
+  console.log(result);
+  console.log('다음 코드 실행');
+}
+
+runSearch();
+```
+
+출력 순서는 `검색 시작 → 검색 응답 받음 → 다음 코드 실행`이다.
+
+- Promise가 `resolve('검색 응답 받음')`으로 완료될 때까지 `runSearch` 함수의 다음 줄은 기다린다.
+- 완료되면 전달된 문자열이 `result`에 들어간다.
+- 그 뒤의 `console.log`들이 차례대로 실행된다.
+
+### `return`과 `async` 함수
+
+일반 함수의 `return`은 함수를 끝내고 값을 돌려준다. `async` 함수도 `return`을 만나면 함수 실행을 끝내지만, 반환값을 Promise에 담아 돌려준다.
+
+```js
+async function getMessage() {
+  return '완료';
+}
+```
+
+- `getMessage()`의 반환값은 Promise다.
+- Promise를 `await`하면 실제 값인 `'완료'`를 받을 수 있다.
+- 명시적으로 반환하지 않은 `async` 함수는 `undefined`로 완료되는 Promise를 반환한다.
+- Playwright 테스트 콜백은 보통 값을 반환할 필요 없이 페이지 동작과 assertion을 실행하고 끝난다.
+
+### Playwright 코드와 연결
+
+```ts
+test('검색할 수 있다', async ({ page }) => {
+  await page.goto('https://www.musinsa.com');
+  const searchField = page.getByRole('textbox');
+});
+```
+
+- `page.goto(...)`는 페이지 이동 작업을 시작하고 완료 결과를 Promise로 제공한다.
+- `await`가 페이지 이동 작업의 완료를 기다린 뒤 다음 줄로 진행한다.
+- 테스트 콜백에 `async`가 붙어 있어 내부에서 `await`를 사용할 수 있다.
+- 실제 Playwright 코드에서 `await`를 빼면 다음 코드가 이동 완료 전에 실행될 수 있으므로, 비동기 메서드가 반환하는 Promise를 기다려야 한다.
+
+</details>
